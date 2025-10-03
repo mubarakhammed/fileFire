@@ -1,0 +1,34 @@
+[package]
+name = "filefire-cloud-api"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Cloud API for FileFire Document SDK"
+
+[[bin]]
+name = "filefire-api"
+path = "src/main.rs"
+
+[dependencies]
+filefire-core = { path = "../../core" }
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+log.workspace = true
+env_logger.workspace = true
+
+# Web server dependencies
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "fs"] }
+hyper = "1.0"
+
+# Additional dependencies
+uuid = { version = "1.6", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+mime = "0.3"
+bytes = "1.0"

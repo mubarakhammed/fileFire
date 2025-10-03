@@ -1,0 +1,25 @@
+[package]
+name = "filefire-signature-plugin"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Digital signature plugin for FileFire Document SDK"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+filefire-core = { path = "../../core" }
+serde.workspace = true
+serde_json.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+log.workspace = true
+
+# Cryptography dependencies (stubs for now)
+# ring = "0.16"  # For cryptographic operations
+# x509-parser = "0.15"  # For certificate handling

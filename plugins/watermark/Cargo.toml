@@ -1,0 +1,22 @@
+[package]
+name = "filefire-watermark-plugin"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Watermark plugin for FileFire Document SDK"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+filefire-core = { path = "../../core" }
+serde.workspace = true
+serde_json.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+log.workspace = true
+image.workspace = true

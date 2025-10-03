@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  filefire-api:
+    build:
+      context: ../..
+      dockerfile: cloud/docker/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - RUST_LOG=info
+      - FILEFIRE_UPLOAD_DIR=/app/uploads
+      - FILEFIRE_TEMP_DIR=/app/temp
+      - FILEFIRE_MAX_FILE_SIZE=100MB
+    volumes:
+      - filefire_uploads:/app/uploads
+      - filefire_temp:/app/temp
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=filefire
+      - POSTGRES_USER=filefire
+      - POSTGRES_PASSWORD=filefire_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - filefire-api
+    restart: unless-stopped
+
+volumes:
+  filefire_uploads:
+  filefire_temp:
+  redis_data:
+  postgres_data:

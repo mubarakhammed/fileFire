@@ -1,0 +1,48 @@
+name: filefire
+description: FileFire Document SDK - Cross-platform document processing with Rust core
+version: 0.1.0
+homepage: https://github.com/mubarakhammed/fileFire
+repository: https://github.com/mubarakhammed/fileFire
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ffi: ^2.1.0
+  path: ^1.8.3
+  meta: ^1.9.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  ffigen: ^9.0.1
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: dev.filefire.filefire
+        pluginClass: FilefirePlugin
+      ios:
+        pluginClass: FilefirePlugin
+      linux:
+        pluginClass: FilefirePlugin
+      macos:
+        pluginClass: FilefirePlugin
+      windows:
+        pluginClass: FilefirePlugin
+      web:
+        pluginClass: FilefireWeb
+        fileName: filefire_web.dart
+
+ffigen:
+  output: "lib/src/generated/filefire_bindings.dart"
+  headers:
+    entry-points:
+      - "../../core/filefire.h"
+  name: "FilefireBindings"
+  description: "Generated bindings for FileFire core library"

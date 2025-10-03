@@ -1,0 +1,54 @@
+[package]
+name = "filefire-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+readme = "../README.md"
+keywords.workspace = true
+categories.workspace = true
+description = "Core engine for FileFire Document SDK"
+
+[lib]
+name = "filefire_core"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+log.workspace = true
+tokio.workspace = true
+async-trait.workspace = true
+
+# PDF processing
+pdf.workspace = true
+lopdf.workspace = true
+
+# Image processing
+image.workspace = true
+
+# Plugin system
+libloading.workspace = true
+dlopen2.workspace = true
+
+# FFI
+libc.workspace = true
+
+# WASM support
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen.workspace = true
+js-sys.workspace = true
+web-sys.workspace = true
+wasm-bindgen-futures = "0.4"
+
+[features]
+default = ["pdf", "image", "plugins"]
+pdf = []
+image = []
+plugins = []
+wasm = ["wasm-bindgen", "js-sys", "web-sys"]

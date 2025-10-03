@@ -1,0 +1,24 @@
+[package]
+name = "filefire-ocr-plugin"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "OCR plugin for FileFire Document SDK"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+filefire-core = { path = "../../core" }
+serde.workspace = true
+serde_json.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+log.workspace = true
+
+# OCR dependencies (stubs for now)
+# tesseract = "0.13"  # Uncomment when implementing real OCR

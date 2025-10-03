@@ -1,0 +1,26 @@
+[package]
+name = "filefire-ai-plugin"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "AI plugin for FileFire Document SDK"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+filefire-core = { path = "../../core" }
+serde.workspace = true
+serde_json.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+log.workspace = true
+
+# AI/ML dependencies (stubs for now)
+# candle-core = "0.3"  # For ML models
+# candle-nn = "0.3"
+# tokenizers = "0.14"
