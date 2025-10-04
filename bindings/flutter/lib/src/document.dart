@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:convert';
 import 'metadata.dart';
 import 'annotation.dart';
 import 'exceptions.dart';
+import 'ffi_bridge.dart';
 
 enum DocumentFormat {
   pdf,
@@ -81,9 +83,9 @@ class Document {
       throw UnsupportedFormatException('Unsupported file format: $extension');
     }
 
-    // TODO: Call native code to open file
-    // For now, simulate with a dummy handle
-    final handle = DateTime.now().millisecondsSinceEpoch % 1000000;
+    // Read file and process through native code
+    final bytes = await File(filePath).readAsBytes();
+    final handle = await FFIBridge.instance.processDocument(bytes, format.name);
     final document = Document._(handle, format);
 
     // Load metadata
@@ -99,9 +101,8 @@ class Document {
       throw UnsupportedFormatException('Unknown document format');
     }
 
-    // TODO: Call native code to open bytes
-    // For now, simulate with a dummy handle
-    final handle = DateTime.now().millisecondsSinceEpoch % 1000000;
+    // Process bytes through native code
+    final handle = await FFIBridge.instance.processDocument(bytes, format.name);
     final document = Document._(handle, format);
 
     // Load metadata
@@ -133,8 +134,14 @@ class Document {
       throw AnnotationException('Invalid page number: $page');
     }
 
-    // TODO: Call native code to add annotation
-    // For now, simulate annotation creation
+    // Call native code to add annotation
+    final success = await FFIBridge.instance
+        .addAnnotation(_handle, x, y, width, height, content);
+
+    if (!success) {
+      throw AnnotationException('Failed to add annotation');
+    }
+
     final annotationId = 'ann_${DateTime.now().millisecondsSinceEpoch}';
     final annotation = Annotation(
       id: annotationId,
@@ -173,9 +180,10 @@ class Document {
 
   /// Save document to file path
   Future<void> save(String filePath) async {
-    // TODO: Call native code to save document
-    // For now, simulate save operation
-    await Future.delayed(const Duration(milliseconds: 100));
+    final success = await FFIBridge.instance.saveDocument(_handle, filePath);
+    if (!success) {
+      throw Exception('Failed to save document to $filePath');
+    }
     _isModified = false;
   }
 
@@ -195,11 +203,8 @@ class Document {
 
   /// Perform OCR on the document
   Future<String> performOCR() async {
-    // TODO: Call OCR plugin through native code
-    // For now, simulate OCR
-    await Future.delayed(const Duration(milliseconds: 2000));
-
-    return 'Sample OCR text extracted from document.\nThis would be the actual text content.';
+    // OCR is handled through the plugin system in native code
+    return await FFIBridge.instance.getDocumentText(_handle);
   }
 
   /// Apply watermark to the document
@@ -215,16 +220,36 @@ class Document {
   }
 
   Future<void> _loadMetadata() async {
-    // TODO: Call native code to extract metadata
-    // For now, simulate metadata loading
-    _metadata = DocumentMetadata(
-      title: 'Sample Document',
-      author: 'FileFire User',
-      pageCount: 10,
-      fileSize: 1024 * 1024, // 1MB
-      mimeType: format.mimeType,
-      creationDate: DateTime.now().toIso8601String(),
-    );
+    try {
+      final metadataJson =
+          await FFIBridge.instance.getDocumentMetadata(_handle);
+      final metadataMap = jsonDecode(metadataJson) as Map<String, dynamic>;
+
+      _metadata = DocumentMetadata(
+        title: metadataMap['title'] ?? 'Unknown Document',
+        author: metadataMap['author'] ?? 'Unknown Author',
+        pageCount: metadataMap['page_count'] ?? 1,
+        fileSize: metadataMap['file_size'] ?? 0,
+        mimeType: format.mimeType,
+        creationDate:
+            metadataMap['creation_date'] ?? DateTime.now().toIso8601String(),
+      );
+    } catch (e) {
+      // Fallback metadata if native call fails
+      _metadata = DocumentMetadata(
+        title: 'Document',
+        author: 'Unknown',
+        pageCount: 1,
+        fileSize: 0,
+        mimeType: format.mimeType,
+        creationDate: DateTime.now().toIso8601String(),
+      );
+    }
+  }
+
+  /// Clean up document resources
+  void dispose() {
+    FFIBridge.instance.cleanupDocument(_handle);
   }
 
   @override
